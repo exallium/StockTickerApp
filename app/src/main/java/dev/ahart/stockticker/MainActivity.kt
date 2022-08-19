@@ -10,10 +10,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import dagger.hilt.android.AndroidEntryPoint
 import dev.ahart.stockticker.list.StockListScreen
 import dev.ahart.stockticker.list.StockListScreenViewModel
 import dev.ahart.stockticker.ui.theme.StockTickerTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
   private val viewModel: StockListScreenViewModel by viewModels()

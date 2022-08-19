@@ -1,4 +1,5 @@
 package dev.ahart.stockticker.list
 
-class StockListState {
-}
+data class StockListState(
+  val quotes: List<StockQuote> = emptyList()
+)
