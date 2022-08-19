@@ -27,6 +27,30 @@ fun StockListScreenPreview() {
           "$1.00",
           "$2.00",
           "$0.50"
+        ),
+        StockQuote(
+          "ASDF",
+          "$1.00",
+          "$2.00",
+          "$0.50"
+        ),
+        StockQuote(
+          "ASDF",
+          "$1.00",
+          "$2.00",
+          "$0.50"
+        ),
+        StockQuote(
+          "ASDF",
+          "$1.00",
+          "$2.00",
+          "$0.50"
+        ),
+        StockQuote(
+          "ASDF",
+          "$1.00",
+          "$2.00",
+          "$0.50"
         )
       )
     )
