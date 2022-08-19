@@ -16,8 +16,17 @@ class StockListScreenViewModel @Inject constructor(repository: StockListScreenRe
   init {
     viewModelScope.launch {
       _uiState.value = StockListState(
-        quotes = repository.getQuotesForFAANG()
+        quotes = repository.getQuotesForFAANG().map { (symbol, quote) ->
+          StockQuote(
+            symbol,
+            quote.currentPrice.formatAsPrice(),
+            quote.highOfDay.formatAsPrice(),
+            quote.lowOfDay.formatAsPrice()
+          )
+        }
       )
     }
   }
+
+  private fun Float.formatAsPrice() = "$%.02f".format(this)
 }

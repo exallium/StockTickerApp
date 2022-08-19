@@ -3,6 +3,16 @@ package dev.ahart.stockticker.api
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+/**
+ * Note:
+ *
+ * I know that I should never be using Floats in financial
+ * situations, HOWEVER, this app does not support any kind
+ * of actual transactions, and it is expressly for
+ * demonstrative purposes. Also changing these to strings
+ * seems to still result in more than 2 decimals but that
+ * could be a code generation issue.
+ */
 @JsonClass(generateAdapter = true)
 data class FinnhubQuote(
   @Json(name = "c") val currentPrice: Float,
