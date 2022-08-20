@@ -8,5 +8,9 @@ package dev.ahart.stockticker.list
  */
 data class StockListState(
   val isRefreshing: Boolean = false,
-  val quotes: List<StockQuote> = emptyList()
-)
+  val networkErrorKey: Long? = null,
+  val quotes: List<StockQuote> = emptyList(),
+  private val isPerformingInitialLoad: Boolean = true
+) {
+  val displayNetworkErrorCard = !isPerformingInitialLoad && !isRefreshing && quotes.isEmpty()
+}

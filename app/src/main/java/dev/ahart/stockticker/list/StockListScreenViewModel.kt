@@ -22,8 +22,15 @@ class StockListScreenViewModel @Inject constructor(private val repository: Stock
 
   init {
     viewModelScope.launch {
-      repository.fetchDefaultQuotesIfNoneExistLocally()
-      repository.fetchDefaultQuotesIfThresholdExceeded(24, TimeUnit.HOURS)
+      when {
+        repository.checkNoDefaultQuotesExistLocally() -> {
+          performRefresh()
+        }
+        repository.checkDefaultQuotesThresholdExceeded(24, TimeUnit.HOURS) -> {
+          performRefresh()
+        }
+      }
+
       while (true) {
         updateUiState()
         delay(TimeUnit.MINUTES.toMillis(1))
@@ -33,11 +40,21 @@ class StockListScreenViewModel @Inject constructor(private val repository: Stock
 
   fun refresh() {
     viewModelScope.launch {
-      _uiState.value = _uiState.value.copy(isRefreshing = true)
-      repository.fetchDefaultQuotes()
-      _uiState.value = _uiState.value.copy(isRefreshing = false)
-      updateUiState()
+      performRefresh()
     }
+  }
+
+  private suspend fun performRefresh() {
+    _uiState.value = _uiState.value.copy(isRefreshing = true)
+
+    val fetchResult = repository.fetchDefaultQuotes()
+
+    _uiState.value = _uiState.value.copy(
+      isRefreshing = false,
+      networkErrorKey = if (fetchResult.isError()) System.currentTimeMillis() else null
+    )
+
+    updateUiState()
   }
 
   private fun updateUiState() {
@@ -54,7 +71,10 @@ class StockListScreenViewModel @Inject constructor(private val repository: Stock
           )
         }
       }.cancellable().collectLatest {
-        _uiState.value = _uiState.value.copy(quotes = it)
+        _uiState.value = _uiState.value.copy(
+          quotes = it,
+          isPerformingInitialLoad = false
+        )
       }
     }
   }
