@@ -9,4 +9,6 @@
     <string name="failed_to_download_quotes">Failed to download quotes</string>
     <string name="please_check_your_network_connection">Please check your network connection</string>
     <string name="retry">Retry</string>
+
+    <string name="faang_stock_quotes">FAANG stock quotes</string>
 </resources>

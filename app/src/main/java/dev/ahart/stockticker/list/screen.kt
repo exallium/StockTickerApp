@@ -54,6 +54,13 @@ fun StockListScreen(stockListState: StockListState, onSwipeToRefresh: () -> Unit
         FailedToDownloadQuotesCard(onSwipeToRefresh)
       } else {
         LazyColumn(content = {
+          item {
+            Text(
+              modifier = Modifier.padding(16.dp),
+              text = stringResource(id = R.string.faang_stock_quotes),
+              style = MaterialTheme.typography.titleLarge
+            )
+          }
           items(stockListState.quotes) { quote ->
             StockQuoteCard(stockQuote = quote)
           }
@@ -62,7 +69,7 @@ fun StockListScreen(stockListState: StockListState, onSwipeToRefresh: () -> Unit
     }
   }
 
-  if (stockListState.quotes.isEmpty()) {
+  if (stockListState.quotes.isNotEmpty()) {
     NetworkErrorSnackBarEffect(snackbarHostState, stockListState.networkErrorKey)
   }
 }
