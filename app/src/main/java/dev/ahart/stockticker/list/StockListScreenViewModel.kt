@@ -24,23 +24,19 @@ class StockListScreenViewModel @Inject constructor(private val repository: Stock
     viewModelScope.launch {
       repository.fetchDefaultQuotesIfNoneExistLocally()
       repository.fetchDefaultQuotesIfThresholdExceeded(24, TimeUnit.HOURS)
-
+      while (true) {
+        updateUiState()
+        delay(TimeUnit.MINUTES.toMillis(1))
+      }
     }
   }
 
   fun refresh() {
     viewModelScope.launch {
-      repositoryJob?.cancel()
       _uiState.value = _uiState.value.copy(isRefreshing = true)
       repository.fetchDefaultQuotes()
-      loopUiUpdate()
-    }
-  }
-
-  private suspend fun loopUiUpdate() {
-    while (true) {
+      _uiState.value = _uiState.value.copy(isRefreshing = false)
       updateUiState()
-      delay(TimeUnit.MINUTES.toMillis(1))
     }
   }
 
@@ -58,7 +54,7 @@ class StockListScreenViewModel @Inject constructor(private val repository: Stock
           )
         }
       }.cancellable().collectLatest {
-        _uiState.value = StockListState(false, it)
+        _uiState.value = _uiState.value.copy(quotes = it)
       }
     }
   }
