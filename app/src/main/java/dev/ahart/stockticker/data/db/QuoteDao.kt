@@ -3,17 +3,20 @@ package dev.ahart.stockticker.data.db
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Simple DAO for interacting with Quotes
+ */
 @Dao
-interface FinnhubQuoteDao {
+interface QuoteDao {
   @Query("SELECT * FROM quote WHERE symbol IN (:symbols)")
-  fun getQuotes(symbols: List<String>): Flow<List<FinnhubQuoteEntity>>
+  fun getQuotes(symbols: List<String>): Flow<List<QuoteEntity>>
 
   @Query("SELECT * FROM quote WHERE symbol IN (:symbols) AND last_updated < :threshold  ORDER BY last_updated ASC LIMIT 1")
-  fun getOldestLastUpdatedBeforeThreshold(symbols: List<String>, threshold: Long): FinnhubQuoteEntity?
+  fun getOldestLastUpdatedBeforeThreshold(symbols: List<String>, threshold: Long): QuoteEntity?
 
   @Query("SELECT COUNT(*) FROM quote WHERE symbol IN (:symbols)")
   fun getCount(symbols: List<String>): Int
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insertAll(quotes: List<FinnhubQuoteEntity>)
+  fun insertAll(quotes: List<QuoteEntity>)
 }

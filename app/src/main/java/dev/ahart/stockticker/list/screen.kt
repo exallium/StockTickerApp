@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dev.ahart.stockticker.R
 
 @Preview
@@ -21,6 +23,7 @@ import dev.ahart.stockticker.R
 fun StockListScreenPreview() {
   StockListScreen(
     StockListState(
+      false,
       listOf(
         StockQuote(
           "ASDF",
@@ -31,16 +34,20 @@ fun StockListScreenPreview() {
         )
       )
     )
-  )
+  ) {}
 }
 
 @Composable
-fun StockListScreen(stockListState: StockListState) {
-  LazyColumn(content = {
-    items(stockListState.quotes) { quote ->
-      StockQuoteCard(stockQuote = quote)
-    }
-  })
+fun StockListScreen(stockListState: StockListState, onSwipeToRefresh: () -> Unit) {
+  SwipeRefresh(
+    state = rememberSwipeRefreshState(isRefreshing = stockListState.isRefreshing),
+    onRefresh = onSwipeToRefresh) {
+    LazyColumn(content = {
+      items(stockListState.quotes) { quote ->
+        StockQuoteCard(stockQuote = quote)
+      }
+    })
+  }
 }
 
 @Composable

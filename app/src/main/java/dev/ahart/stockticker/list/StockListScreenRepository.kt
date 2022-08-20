@@ -1,16 +1,16 @@
-package dev.ahart.stockticker.data
+package dev.ahart.stockticker.list
 
 import dev.ahart.stockticker.data.api.FinnhubService
-import dev.ahart.stockticker.data.db.FinnhubDatabase
-import dev.ahart.stockticker.data.db.FinnhubQuoteEntity
+import dev.ahart.stockticker.data.db.QuoteDatabase
+import dev.ahart.stockticker.data.db.QuoteEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class FinnhubRepository @Inject constructor(
-  private val database: FinnhubDatabase,
+class StockListScreenRepository @Inject constructor(
+  private val database: QuoteDatabase,
   private val service: FinnhubService)
 {
   suspend fun fetchDefaultQuotesIfNoneExistLocally() {
@@ -35,7 +35,7 @@ class FinnhubRepository @Inject constructor(
     withContext(Dispatchers.IO) {
       val entities = FAANG.map {
         val quote = service.getQuote(it)
-        FinnhubQuoteEntity(
+        QuoteEntity(
           symbol = it,
           currentPrice = quote.currentPrice,
           lowOfDay = quote.lowOfDay,
@@ -48,7 +48,7 @@ class FinnhubRepository @Inject constructor(
     }
   }
 
-  fun getDefaultQuotes(): Flow<List<FinnhubQuoteEntity>> {
+  fun getDefaultQuotes(): Flow<List<QuoteEntity>> {
     return database.quoteDao().getQuotes(FAANG)
   }
 
