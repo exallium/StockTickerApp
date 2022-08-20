@@ -26,31 +26,8 @@ fun StockListScreenPreview() {
           "ASDF",
           "$1.00",
           "$2.00",
-          "$0.50"
-        ),
-        StockQuote(
-          "ASDF",
-          "$1.00",
-          "$2.00",
-          "$0.50"
-        ),
-        StockQuote(
-          "ASDF",
-          "$1.00",
-          "$2.00",
-          "$0.50"
-        ),
-        StockQuote(
-          "ASDF",
-          "$1.00",
-          "$2.00",
-          "$0.50"
-        ),
-        StockQuote(
-          "ASDF",
-          "$1.00",
-          "$2.00",
-          "$0.50"
+          "$0.50",
+          "23 minutes ago"
         )
       )
     )
@@ -74,11 +51,20 @@ private fun StockQuoteCard(stockQuote: StockQuote) {
       .fillMaxWidth()
   ) {
     Row(modifier = Modifier.padding(16.dp)) {
-      Text(
-        modifier = Modifier.weight(1f),
-        text = stockQuote.symbol,
-        style = MaterialTheme.typography.headlineMedium
-      )
+      Column(modifier = Modifier.weight(1f)) {
+        Text(
+          text = stockQuote.symbol,
+          style = MaterialTheme.typography.headlineMedium
+        )
+        Text(
+          text = stringResource(id = R.string.last_updated),
+          style = MaterialTheme.typography.labelMedium
+        )
+        Text(
+          text = stockQuote.lastUpdated,
+          style = MaterialTheme.typography.bodySmall
+        )
+      }
 
       StockQuotePrices(stockQuote = stockQuote)
     }
@@ -89,12 +75,12 @@ private fun StockQuoteCard(stockQuote: StockQuote) {
 private fun StockQuotePrices(stockQuote: StockQuote) {
   Column {
     Text(text = stringResource(id = R.string.current_price))
-    Text(text = stringResource(id = R.string.low_of_the_day))
+    Text(text = stringResource(id = R.string.low_of_the_day), color = MaterialTheme.colorScheme.error)
     Text(text = stringResource(id = R.string.high_of_the_day))
   }
   Column(modifier = Modifier.padding(start = 16.dp)) {
     Text(text = stockQuote.currentPrice)
-    Text(text = stockQuote.lowOfDay)
+    Text(text = stockQuote.lowOfDay, color = MaterialTheme.colorScheme.error)
     Text(text = stockQuote.highOfDay)
   }
 }

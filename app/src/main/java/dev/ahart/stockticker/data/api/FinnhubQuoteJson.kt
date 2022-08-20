@@ -1,4 +1,4 @@
-package dev.ahart.stockticker.api
+package dev.ahart.stockticker.data.api
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -14,7 +14,7 @@ import com.squareup.moshi.JsonClass
  * could be a code generation issue.
  */
 @JsonClass(generateAdapter = true)
-data class FinnhubQuote(
+data class FinnhubQuoteJson(
   @Json(name = "c") val currentPrice: Float,
   @Json(name = "d") val change: Float,
   @Json(name = "dp") val percentChange: Float,

@@ -1,4 +1,4 @@
-package dev.ahart.stockticker.api
+package dev.ahart.stockticker.data.api
 
 import dev.ahart.stockticker.BuildConfig
 import okhttp3.Interceptor
@@ -15,7 +15,7 @@ import retrofit2.http.Query
 interface FinnhubService {
 
   @GET("quote")
-  suspend fun getQuote(@Query("symbol") symbol: String): FinnhubQuote
+  suspend fun getQuote(@Query("symbol") symbol: String): FinnhubQuoteJson
 
   companion object {
     /**

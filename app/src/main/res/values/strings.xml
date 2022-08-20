@@ -4,4 +4,5 @@
     <string name="current_price">Current price:</string>
     <string name="low_of_the_day">Low of the day:</string>
     <string name="high_of_the_day">High of the day:</string>
+    <string name="last_updated">Last updated</string>
 </resources>
