@@ -74,7 +74,7 @@ private fun StockQuoteCard(stockQuote: StockQuote) {
 @Composable
 private fun StockQuotePrices(stockQuote: StockQuote) {
   Column {
-    Text(text = stringResource(id = R.string.current_price))
+    Text(text = stringResource(id = R.string.latest_price))
     Text(text = stringResource(id = R.string.low_of_the_day), color = MaterialTheme.colorScheme.error)
     Text(text = stringResource(id = R.string.high_of_the_day))
   }
