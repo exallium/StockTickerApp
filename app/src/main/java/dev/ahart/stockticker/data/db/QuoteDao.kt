@@ -8,14 +8,11 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface QuoteDao {
-  @Query("SELECT * FROM quote WHERE symbol IN (:symbols)")
-  fun getQuotes(symbols: List<String>): Flow<List<QuoteEntity>>
+  @Query("SELECT * FROM quote WHERE symbol IN (SELECT symbol FROM watchlist)")
+  fun getWatchlistQuotes(): Flow<List<QuoteEntity>>
 
-  @Query("SELECT * FROM quote WHERE symbol IN (:symbols) AND last_updated < :threshold  ORDER BY last_updated ASC LIMIT 1")
-  fun getOldestLastUpdatedBeforeThreshold(symbols: List<String>, threshold: Long): QuoteEntity?
-
-  @Query("SELECT COUNT(*) FROM quote WHERE symbol IN (:symbols)")
-  fun getCount(symbols: List<String>): Int
+  @Query("SELECT * FROM quote WHERE symbol IN (:symbols) AND symbol NOT IN (SELECT symbol from watchlist)")
+  fun getNonWatchlistQuotes(symbols: List<String>): Flow<List<QuoteEntity>>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insertAll(quotes: List<QuoteEntity>)

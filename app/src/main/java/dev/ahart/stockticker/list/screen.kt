@@ -27,7 +27,7 @@ import dev.ahart.stockticker.R
 fun StockListScreenPreview() {
   StockListScreen(
     StockListState(
-      quotes = listOf(
+      faangQuotes = listOf(
         StockQuote(
           "ASDF",
           "$1.00",
@@ -65,6 +65,19 @@ fun StockListScreen(
         FailedToDownloadQuotesCard(onSwipeToRefresh)
       } else {
         LazyColumn(content = {
+          if (stockListState.watchlistQuotes.isNotEmpty()) {
+            item {
+              Text(
+                modifier = Modifier.padding(16.dp),
+                text = stringResource(id = R.string.watchlist),
+                style = MaterialTheme.typography.titleLarge
+              )
+            }
+            items(stockListState.watchlistQuotes) { quote ->
+              StockQuoteCard(stockQuote = quote)
+            }
+          }
+
           item {
             Text(
               modifier = Modifier.padding(16.dp),
@@ -72,7 +85,7 @@ fun StockListScreen(
               style = MaterialTheme.typography.titleLarge
             )
           }
-          items(stockListState.quotes) { quote ->
+          items(stockListState.faangQuotes) { quote ->
             StockQuoteCard(stockQuote = quote)
           }
         })
@@ -80,7 +93,7 @@ fun StockListScreen(
     }
   }
 
-  if (stockListState.quotes.isNotEmpty()) {
+  if (stockListState.faangQuotes.isNotEmpty()) {
     NetworkErrorSnackBarEffect(snackbarHostState, stockListState.networkErrorKey)
   }
 }

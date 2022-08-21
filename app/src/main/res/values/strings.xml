@@ -12,4 +12,5 @@
 
     <string name="faang_stock_quotes">FAANG stock quotes</string>
     <string name="search_for_a_symbol">Search for a symbol to watch</string>
+    <string name="watchlist">Watchlist</string>
 </resources>

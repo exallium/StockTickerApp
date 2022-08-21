@@ -19,7 +19,8 @@ class StockListScreenViewModel @Inject constructor(private val repository: Finnh
   private val _uiState = MutableStateFlow(StockListState())
   val uiState: StateFlow<StockListState> = _uiState
 
-  private var repositoryJob: Job? = null
+  private var watchlistJob: Job? = null
+  private var faangJob: Job? = null
   private var searchJob: Job? = null
 
   init {
@@ -55,7 +56,17 @@ class StockListScreenViewModel @Inject constructor(private val repository: Finnh
   }
 
   fun onSymbolSearchSuggestionSelected(symbolSearchSuggestion: StockListState.SymbolSearchSuggestion) {
-    // TODO
+    viewModelScope.launch {
+      _uiState.value = _uiState.value.copy(
+        symbolSearchState = StockListState.SymbolSearchState()
+      )
+
+      val addResult = repository.addToWatchlist(symbolSearchSuggestion.symbol)
+
+      _uiState.value = _uiState.value.copy(
+        networkErrorKey = if (addResult.isFailure()) System.currentTimeMillis() else _uiState.value.networkErrorKey
+      )
+    }
   }
 
   private suspend fun performRefresh() {
@@ -72,8 +83,27 @@ class StockListScreenViewModel @Inject constructor(private val repository: Finnh
   }
 
   private fun updateUiState() {
-    repositoryJob?.cancel()
-    repositoryJob = viewModelScope.launch(context = Dispatchers.IO) {
+    watchlistJob?.cancel()
+    watchlistJob = viewModelScope.launch(context = Dispatchers.IO) {
+      repository.getWatchlistQuotes().map { entities ->
+        entities.map { entity ->
+          StockQuote(
+            entity.symbol,
+            entity.currentPrice.formatAsPrice(),
+            entity.highOfDay.formatAsPrice(),
+            entity.lowOfDay.formatAsPrice(),
+            entity.lastUpdated.formatAsDateTime()
+          )
+        }
+      }.cancellable().collectLatest {
+        _uiState.value = _uiState.value.copy(
+          watchlistQuotes = it
+        )
+      }
+    }
+
+    faangJob?.cancel()
+    faangJob = viewModelScope.launch(context = Dispatchers.IO) {
       repository.getFaangQuotes().map { entities ->
         entities.map { entity ->
           StockQuote(
@@ -86,7 +116,7 @@ class StockListScreenViewModel @Inject constructor(private val repository: Finnh
         }
       }.cancellable().collectLatest {
         _uiState.value = _uiState.value.copy(
-          quotes = it,
+          faangQuotes = it,
           isPerformingInitialLoad = false
         )
       }

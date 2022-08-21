@@ -4,16 +4,20 @@ package dev.ahart.stockticker.list
  * State for the StockListScreen
  *
  * @param isRefreshing Whether or not we're currently downloading data
- * @param quotes The stock quotes to display.
+ * @param faangQuotes The stock quotes to display.
  */
 data class StockListState(
   val isRefreshing: Boolean = false,
   val networkErrorKey: Long? = null,
-  val quotes: List<StockQuote> = emptyList(),
+  val watchlistQuotes: List<StockQuote> = emptyList(),
+  val faangQuotes: List<StockQuote> = emptyList(),
   private val isPerformingInitialLoad: Boolean = true,
   val symbolSearchState: SymbolSearchState = SymbolSearchState()
 ) {
-  val displayNetworkErrorCard = !isPerformingInitialLoad && !isRefreshing && quotes.isEmpty()
+  val displayNetworkErrorCard = !isPerformingInitialLoad &&
+      !isRefreshing &&
+      faangQuotes.isEmpty() &&
+      watchlistQuotes.isEmpty()
 
   data class SymbolSearchState(
     val query: String = "",
