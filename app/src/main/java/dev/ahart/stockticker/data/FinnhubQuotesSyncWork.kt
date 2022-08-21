@@ -20,13 +20,8 @@ class FinnhubQuotesSyncWork @AssistedInject constructor(
 
   override suspend fun doWork(): Result {
     Log.i(TAG, "Downloading latest quotes...")
-    return when (repository.fetchDefaultQuotes()) {
-      FinnhubFetchResult.SUCCESS -> {
-        when (repository.fetchWatchlistQuotes()) {
-          FinnhubFetchResult.SUCCESS -> Result.success()
-          FinnhubFetchResult.FAILURE -> Result.retry()
-        }
-      }
+    return when (repository.fetchQuotes()) {
+      FinnhubFetchResult.SUCCESS -> Result.success()
       FinnhubFetchResult.FAILURE -> Result.retry()
     }
   }

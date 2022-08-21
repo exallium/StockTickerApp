@@ -44,7 +44,28 @@ class FinnhubRepository @Inject constructor(
     }
   }
 
-  suspend fun fetchDefaultQuotes(): FinnhubFetchResult {
+  suspend fun fetchQuotes(): FinnhubFetchResult {
+    return withContext(Dispatchers.IO) {
+      val defaultResult = fetchDefaultQuotes()
+      val watchlistResult = fetchWatchlistQuotes()
+
+      if (defaultResult.isFailure() || watchlistResult.isFailure()) {
+        FinnhubFetchResult.FAILURE
+      } else {
+        FinnhubFetchResult.SUCCESS
+      }
+    }
+  }
+
+  fun getWatchlistQuotes(): Flow<List<QuoteEntity>> {
+    return database.quoteDao().getWatchlistQuotes()
+  }
+
+  fun getFaangQuotes(): Flow<List<QuoteEntity>> {
+    return database.quoteDao().getNonWatchlistQuotes(Constants.FAANG)
+  }
+
+  private suspend fun fetchDefaultQuotes(): FinnhubFetchResult {
     return withContext(Dispatchers.IO) {
       var result = FinnhubFetchResult.SUCCESS
       val entities = Constants.FAANG.mapNotNull {
@@ -61,7 +82,7 @@ class FinnhubRepository @Inject constructor(
     }
   }
 
-  suspend fun fetchWatchlistQuotes(): FinnhubFetchResult {
+  private suspend fun fetchWatchlistQuotes(): FinnhubFetchResult {
     return withContext(Dispatchers.IO) {
       var result = FinnhubFetchResult.SUCCESS
       val entities = database.watchlistDao().getWatchlist().map { it.symbol }.mapNotNull {
@@ -93,13 +114,5 @@ class FinnhubRepository @Inject constructor(
       Log.w(TAG, "Could not download quote.", e)
       null
     }
-  }
-
-  fun getWatchlistQuotes(): Flow<List<QuoteEntity>> {
-    return database.quoteDao().getWatchlistQuotes()
-  }
-
-  fun getFaangQuotes(): Flow<List<QuoteEntity>> {
-    return database.quoteDao().getNonWatchlistQuotes(Constants.FAANG)
   }
 }
