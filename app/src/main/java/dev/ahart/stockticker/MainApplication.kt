@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
 import dagger.hilt.android.HiltAndroidApp
-import dev.ahart.stockticker.data.FinnhubFaangQuotesSyncWork
+import dev.ahart.stockticker.data.FinnhubQuotesSyncWork
 import dev.ahart.stockticker.data.FinnhubSymbolSyncWork
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -25,7 +25,7 @@ class MainApplication : Application(), Configuration.Provider {
       )
       .build()
 
-    val quotesWorker = PeriodicWorkRequestBuilder<FinnhubFaangQuotesSyncWork>(24, TimeUnit.HOURS)
+    val quotesWorker = PeriodicWorkRequestBuilder<FinnhubQuotesSyncWork>(24, TimeUnit.HOURS)
       .setConstraints(Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()

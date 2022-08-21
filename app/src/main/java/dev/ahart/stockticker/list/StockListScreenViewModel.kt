@@ -72,11 +72,14 @@ class StockListScreenViewModel @Inject constructor(private val repository: Finnh
   private suspend fun performRefresh() {
     _uiState.value = _uiState.value.copy(isRefreshing = true)
 
-    val fetchResult = repository.fetchDefaultQuotes()
+    val defaultResult = repository.fetchDefaultQuotes()
+    val watchlistResult = repository.fetchWatchlistQuotes()
 
     _uiState.value = _uiState.value.copy(
       isRefreshing = false,
-      networkErrorKey = if (fetchResult.isFailure()) System.currentTimeMillis() else null
+      networkErrorKey = if (listOf(defaultResult, watchlistResult).any { it.isFailure() }) {
+        System.currentTimeMillis()
+      } else null
     )
 
     updateUiState()

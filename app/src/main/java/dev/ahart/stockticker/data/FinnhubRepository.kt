@@ -50,6 +50,7 @@ class FinnhubRepository @Inject constructor(
       val entities = Constants.FAANG.mapNotNull {
         val quote = fetchQuote(it)
         if (quote == null) {
+          Log.w(TAG, "Found a null quote in defaults, reporting failure.")
           result = FinnhubFetchResult.FAILURE
         }
         quote
@@ -60,23 +61,36 @@ class FinnhubRepository @Inject constructor(
     }
   }
 
+  suspend fun fetchWatchlistQuotes(): FinnhubFetchResult {
+    return withContext(Dispatchers.IO) {
+      var result = FinnhubFetchResult.SUCCESS
+      val entities = database.watchlistDao().getWatchlist().map { it.symbol }.mapNotNull {
+        val quote = fetchQuote(it)
+        if (quote == null) {
+          Log.w(TAG, "Found a null quote in watchlist, reporting failure.")
+          result = FinnhubFetchResult.FAILURE
+        }
+        quote
+      }
+
+     database.quoteDao().insertAll(entities)
+     result
+    }
+  }
+
   private suspend fun fetchQuote(symbol: String): QuoteEntity? {
-    val quote: FinnhubQuoteJson? = try {
-      service.getQuote(symbol)
+    return try {
+      service.getQuote(symbol).let { quote ->
+        QuoteEntity(
+          symbol = symbol,
+          currentPrice = quote.currentPrice,
+          lowOfDay = quote.lowOfDay,
+          highOfDay = quote.highOfDay,
+          lastUpdated = System.currentTimeMillis()
+        )
+      }
     } catch (e: UnknownHostException) {
       Log.w(TAG, "Could not download quote.", e)
-      null
-    }
-
-    return if (quote != null) {
-      QuoteEntity(
-        symbol = symbol,
-        currentPrice = quote.currentPrice,
-        lowOfDay = quote.lowOfDay,
-        highOfDay = quote.highOfDay,
-        lastUpdated = System.currentTimeMillis()
-      )
-    } else {
       null
     }
   }

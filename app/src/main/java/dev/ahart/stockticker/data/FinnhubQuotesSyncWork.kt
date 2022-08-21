@@ -9,19 +9,24 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 @HiltWorker
-class FinnhubFaangQuotesSyncWork @AssistedInject constructor(
+class FinnhubQuotesSyncWork @AssistedInject constructor(
   @Assisted applicationContext: Context,
   @Assisted workerParameters: WorkerParameters,
   private val repository: FinnhubRepository
 ) : CoroutineWorker(applicationContext, workerParameters) {
   companion object {
-    val TAG = FinnhubFaangQuotesSyncWork::class.simpleName
+    val TAG = FinnhubQuotesSyncWork::class.simpleName
   }
 
   override suspend fun doWork(): Result {
-    Log.i(TAG, "Downloading latest FAANG quotes...")
+    Log.i(TAG, "Downloading latest quotes...")
     return when (repository.fetchDefaultQuotes()) {
-      FinnhubFetchResult.SUCCESS -> Result.success()
+      FinnhubFetchResult.SUCCESS -> {
+        when (repository.fetchWatchlistQuotes()) {
+          FinnhubFetchResult.SUCCESS -> Result.success()
+          FinnhubFetchResult.FAILURE -> Result.retry()
+        }
+      }
       FinnhubFetchResult.FAILURE -> Result.retry()
     }
   }
