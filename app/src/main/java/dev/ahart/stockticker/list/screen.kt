@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dev.ahart.stockticker.R
@@ -33,17 +36,25 @@ fun StockListScreenPreview() {
           "23 minutes ago"
         )
       )
-    )
-  ) {}
+    ),
+    {}, {}, {})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StockListScreen(stockListState: StockListState, onSwipeToRefresh: () -> Unit) {
+fun StockListScreen(
+  stockListState: StockListState,
+  onSwipeToRefresh: () -> Unit,
+  onSymbolSearchQueryChanged: (String) -> Unit,
+  onSymbolSearchSuggestionClicked: (StockListState.SymbolSearchSuggestion) -> Unit
+) {
   val snackbarHostState = remember { SnackbarHostState() }
 
   Scaffold(
-    snackbarHost = { SnackbarHost(snackbarHostState) }
+    snackbarHost = { SnackbarHost(snackbarHostState) },
+    topBar = {
+      SymbolSearch(stockListState.symbolSearchState, onSymbolSearchQueryChanged, onSymbolSearchSuggestionClicked)
+    }
   ) {
     SwipeRefresh(
       modifier = Modifier.padding(it),
@@ -166,5 +177,44 @@ private fun StockQuotePrices(stockQuote: StockQuote) {
     Text(text = stockQuote.currentPrice)
     Text(text = stockQuote.lowOfDay, color = MaterialTheme.colorScheme.error)
     Text(text = stockQuote.highOfDay)
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SymbolSearch(
+  symbolSearchState: StockListState.SymbolSearchState,
+  onQueryChanged: (String) -> Unit,
+  onSuggestionClicked: (StockListState.SymbolSearchSuggestion) -> Unit
+) {
+  Column {
+    TextField(
+      modifier = Modifier.fillMaxWidth(),
+      value = symbolSearchState.query,
+      onValueChange = onQueryChanged,
+      leadingIcon = {
+        Icon(
+          imageVector = Icons.Default.Search,
+          contentDescription = null
+        )
+      },
+      placeholder = {
+        Text(text = stringResource(id = R.string.search_for_a_symbol))
+      }
+    )
+    DropdownMenu(
+      modifier = Modifier.fillMaxWidth(),
+      expanded = symbolSearchState.suggestions.isNotEmpty(),
+      onDismissRequest = { },
+      properties = PopupProperties(focusable = false)
+    ) {
+      symbolSearchState.suggestions.forEach {
+        DropdownMenuItem(
+          modifier = Modifier.fillMaxWidth(),
+          text = { Text("${it.symbol} - ${it.description}") },
+          onClick = { onSuggestionClicked(it) }
+        )
+      }
+    }
   }
 }

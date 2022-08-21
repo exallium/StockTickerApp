@@ -4,6 +4,7 @@ import android.text.format.DateUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.ahart.stockticker.data.FinnhubRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -13,24 +14,16 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
-class StockListScreenViewModel @Inject constructor(private val repository: StockListScreenRepository) :
+class StockListScreenViewModel @Inject constructor(private val repository: FinnhubRepository) :
   ViewModel() {
   private val _uiState = MutableStateFlow(StockListState())
   val uiState: StateFlow<StockListState> = _uiState
 
   private var repositoryJob: Job? = null
+  private var searchJob: Job? = null
 
   init {
     viewModelScope.launch {
-      when {
-        repository.checkNoDefaultQuotesExistLocally() -> {
-          performRefresh()
-        }
-        repository.checkDefaultQuotesThresholdExceeded(24, TimeUnit.HOURS) -> {
-          performRefresh()
-        }
-      }
-
       while (true) {
         updateUiState()
         delay(TimeUnit.MINUTES.toMillis(1))
@@ -44,6 +37,27 @@ class StockListScreenViewModel @Inject constructor(private val repository: Stock
     }
   }
 
+  fun onSymbolSearchQueryChanged(query: String) {
+    _uiState.value = _uiState.value.copy(
+      symbolSearchState = _uiState.value.symbolSearchState.copy(query = query)
+    )
+
+    searchJob?.cancel()
+    searchJob = viewModelScope.launch {
+      _uiState.value = _uiState.value.copy(
+        symbolSearchState = _uiState.value.symbolSearchState.copy(
+          suggestions = repository.findMatchingSymbols(query).map {
+            StockListState.SymbolSearchSuggestion(it.symbol, it.description)
+          }
+        )
+      )
+    }
+  }
+
+  fun onSymbolSearchSuggestionSelected(symbolSearchSuggestion: StockListState.SymbolSearchSuggestion) {
+    // TODO
+  }
+
   private suspend fun performRefresh() {
     _uiState.value = _uiState.value.copy(isRefreshing = true)
 
@@ -51,7 +65,7 @@ class StockListScreenViewModel @Inject constructor(private val repository: Stock
 
     _uiState.value = _uiState.value.copy(
       isRefreshing = false,
-      networkErrorKey = if (fetchResult.isError()) System.currentTimeMillis() else null
+      networkErrorKey = if (fetchResult.isFailure()) System.currentTimeMillis() else null
     )
 
     updateUiState()
@@ -60,7 +74,7 @@ class StockListScreenViewModel @Inject constructor(private val repository: Stock
   private fun updateUiState() {
     repositoryJob?.cancel()
     repositoryJob = viewModelScope.launch(context = Dispatchers.IO) {
-      repository.getDefaultQuotes().map { entities ->
+      repository.getFaangQuotes().map { entities ->
         entities.map { entity ->
           StockQuote(
             entity.symbol,

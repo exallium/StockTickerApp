@@ -8,7 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.ahart.stockticker.data.api.FinnhubService
-import dev.ahart.stockticker.data.db.QuoteDatabase
+import dev.ahart.stockticker.data.db.StockTickerDatabase
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -19,10 +19,10 @@ class DataModule {
   }
 
   @Provides
-  fun provideDatabase(@ApplicationContext context: Context): QuoteDatabase {
+  fun provideDatabase(@ApplicationContext context: Context): StockTickerDatabase {
     return Room.databaseBuilder(
       context,
-      QuoteDatabase::class.java,
+      StockTickerDatabase::class.java,
       "stock-ticker"
     ).build()
   }

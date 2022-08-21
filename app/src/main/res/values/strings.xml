@@ -11,4 +11,5 @@
     <string name="retry">Retry</string>
 
     <string name="faang_stock_quotes">FAANG stock quotes</string>
+    <string name="search_for_a_symbol">Search for a symbol to watch</string>
 </resources>

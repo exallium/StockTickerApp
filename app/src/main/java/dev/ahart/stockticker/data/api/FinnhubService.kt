@@ -17,6 +17,9 @@ interface FinnhubService {
   @GET("quote")
   suspend fun getQuote(@Query("symbol") symbol: String): FinnhubQuoteJson
 
+  @GET("stock/symbol")
+  suspend fun getSymbols(@Query("exchange") exchange: String): List<FinnhubSymbolJson>
+
   companion object {
     /**
      * Creates a new instance of FinnhubService which can be used to query the
