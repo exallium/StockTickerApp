@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,6 +22,8 @@ import androidx.compose.ui.window.PopupProperties
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dev.ahart.stockticker.R
+import me.saket.swipe.SwipeAction
+import me.saket.swipe.SwipeableActionsBox
 
 @Preview
 @Composable
@@ -37,7 +40,7 @@ fun StockListScreenPreview() {
         )
       )
     ),
-    {}, {}, {})
+    {}, {}, {}, {})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +49,8 @@ fun StockListScreen(
   stockListState: StockListState,
   onSwipeToRefresh: () -> Unit,
   onSymbolSearchQueryChanged: (String) -> Unit,
-  onSymbolSearchSuggestionClicked: (StockListState.SymbolSearchSuggestion) -> Unit
+  onSymbolSearchSuggestionClicked: (StockListState.SymbolSearchSuggestion) -> Unit,
+  onWatchlistRowSwiped: (StockQuote) -> Unit
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
 
@@ -55,9 +59,9 @@ fun StockListScreen(
     topBar = {
       SymbolSearch(stockListState.symbolSearchState, onSymbolSearchQueryChanged, onSymbolSearchSuggestionClicked)
     }
-  ) {
+  ) { paddingValues ->
     SwipeRefresh(
-      modifier = Modifier.padding(it),
+      modifier = Modifier.padding(paddingValues),
       state = rememberSwipeRefreshState(isRefreshing = stockListState.isRefreshing),
       onRefresh = onSwipeToRefresh
     ) {
@@ -66,26 +70,32 @@ fun StockListScreen(
       } else {
         LazyColumn(content = {
           if (stockListState.watchlistQuotes.isNotEmpty()) {
-            item {
+            item(key = "watchlist-header") {
               Text(
                 modifier = Modifier.padding(16.dp),
                 text = stringResource(id = R.string.watchlist),
                 style = MaterialTheme.typography.titleLarge
               )
             }
-            items(stockListState.watchlistQuotes) { quote ->
-              StockQuoteCard(stockQuote = quote)
+            items(
+              items = stockListState.watchlistQuotes,
+              key = { "watchlist-${it.symbol}" }
+            ) { quote ->
+              WatchlistQuoteCard(stockQuote = quote, onWatchlistRowSwiped)
             }
           }
 
-          item {
+          item(key = "faang-header") {
             Text(
               modifier = Modifier.padding(16.dp),
               text = stringResource(id = R.string.faang_stock_quotes),
               style = MaterialTheme.typography.titleLarge
             )
           }
-          items(stockListState.faangQuotes) { quote ->
+          items(
+            items = stockListState.faangQuotes,
+            key = { "faang-${it.symbol}"}
+          ) { quote ->
             StockQuoteCard(stockQuote = quote)
           }
         })
@@ -145,6 +155,22 @@ private fun FailedToDownloadQuotesCard(onClickToRefresh: () -> Unit) {
         Text(stringResource(id = R.string.retry))
       }
     }
+  }
+}
+
+@Composable
+private fun WatchlistQuoteCard(stockQuote: StockQuote, onSwipe: (StockQuote) -> Unit) {
+  val startAction = SwipeAction(
+    onSwipe = { onSwipe(stockQuote) },
+    icon = { Icon(Icons.Default.Delete, contentDescription = stringResource(id = R.string.remove_from_watchlist)) },
+    background = MaterialTheme.colorScheme.error
+  )
+
+  SwipeableActionsBox(
+    startActions = listOf(startAction),
+    backgroundUntilSwipeThreshold = MaterialTheme.colorScheme.background
+  ) {
+    StockQuoteCard(stockQuote = stockQuote)
   }
 }
 

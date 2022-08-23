@@ -3,10 +3,7 @@ package dev.ahart.stockticker.data
 import android.util.Log
 import dev.ahart.stockticker.data.api.FinnhubQuoteJson
 import dev.ahart.stockticker.data.api.FinnhubService
-import dev.ahart.stockticker.data.db.QuoteEntity
-import dev.ahart.stockticker.data.db.StockEntity
-import dev.ahart.stockticker.data.db.StockTickerDatabase
-import dev.ahart.stockticker.data.db.WatchlistEntity
+import dev.ahart.stockticker.data.db.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -40,6 +37,16 @@ class FinnhubRepository @Inject constructor(
         FinnhubFetchResult.SUCCESS
       } else {
         FinnhubFetchResult.FAILURE
+      }
+    }
+  }
+
+  suspend fun removeFromWatchlist(symbol: String) {
+    return withContext(Dispatchers.IO) {
+      val watchlistEntity = WatchlistEntity(symbol)
+      database.watchlistDao().removeFromWatchlist(watchlistEntity)
+      if (symbol !in Constants.FAANG) {
+        database.quoteDao().delete(watchlistEntity)
       }
     }
   }

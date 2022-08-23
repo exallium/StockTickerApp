@@ -30,7 +30,8 @@ class MainActivity : ComponentActivity() {
           StockListScreen(stockListScreenState,
             viewModel::refresh,
             viewModel::onSymbolSearchQueryChanged,
-            viewModel::onSymbolSearchSuggestionSelected
+            viewModel::onSymbolSearchSuggestionSelected,
+            viewModel::onWatchlistQuoteSwiped
           )
         }
       }

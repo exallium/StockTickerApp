@@ -77,6 +77,7 @@ dependencies {
     kapt 'androidx.hilt:hilt-compiler:1.0.0'
     implementation 'androidx.datastore:datastore:1.0.0'
     implementation  "com.google.protobuf:protobuf-javalite:3.18.0"
+    implementation 'me.saket.swipe:swipe:1.0.0'
 
     testImplementation 'junit:junit:4.13.2'
 

@@ -16,4 +16,7 @@ interface QuoteDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insertAll(quotes: List<QuoteEntity>)
+
+  @Delete(entity = QuoteEntity::class)
+  fun delete(watchlistEntity: WatchlistEntity)
 }

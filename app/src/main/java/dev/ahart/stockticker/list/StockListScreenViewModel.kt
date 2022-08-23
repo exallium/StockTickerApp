@@ -69,6 +69,12 @@ class StockListScreenViewModel @Inject constructor(private val repository: Finnh
     }
   }
 
+  fun onWatchlistQuoteSwiped(stockQuote: StockQuote) {
+    viewModelScope.launch {
+      repository.removeFromWatchlist(stockQuote.symbol)
+    }
+  }
+
   private suspend fun performRefresh() {
     _uiState.value = _uiState.value.copy(isRefreshing = true)
 
