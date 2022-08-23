@@ -1,5 +1,6 @@
 package dev.ahart.stockticker.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,7 +44,7 @@ fun StockListScreenPreview() {
     {}, {}, {}, {})
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun StockListScreen(
   stockListState: StockListState,
@@ -79,9 +80,11 @@ fun StockListScreen(
             }
             items(
               items = stockListState.watchlistQuotes,
-              key = { "watchlist-${it.symbol}" }
+              key = { it.symbol }
             ) { quote ->
-              WatchlistQuoteCard(stockQuote = quote, onWatchlistRowSwiped)
+              WatchlistQuoteCard(
+                modifier = Modifier.animateItemPlacement(),
+                stockQuote = quote, onWatchlistRowSwiped)
             }
           }
 
@@ -94,9 +97,12 @@ fun StockListScreen(
           }
           items(
             items = stockListState.faangQuotes,
-            key = { "faang-${it.symbol}"}
+            key = { it.symbol }
           ) { quote ->
-            StockQuoteCard(stockQuote = quote)
+            StockQuoteCard(
+              modifier = Modifier.animateItemPlacement(),
+              stockQuote = quote
+            )
           }
         })
       }
@@ -159,7 +165,11 @@ private fun FailedToDownloadQuotesCard(onClickToRefresh: () -> Unit) {
 }
 
 @Composable
-private fun WatchlistQuoteCard(stockQuote: StockQuote, onSwipe: (StockQuote) -> Unit) {
+private fun WatchlistQuoteCard(
+  modifier: Modifier,
+  stockQuote: StockQuote,
+  onSwipe: (StockQuote) -> Unit
+) {
   val startAction = SwipeAction(
     onSwipe = { onSwipe(stockQuote) },
     icon = { Icon(Icons.Default.Delete, contentDescription = stringResource(id = R.string.remove_from_watchlist)) },
@@ -167,6 +177,7 @@ private fun WatchlistQuoteCard(stockQuote: StockQuote, onSwipe: (StockQuote) -> 
   )
 
   SwipeableActionsBox(
+    modifier = modifier,
     startActions = listOf(startAction),
     backgroundUntilSwipeThreshold = MaterialTheme.colorScheme.background
   ) {
@@ -175,9 +186,9 @@ private fun WatchlistQuoteCard(stockQuote: StockQuote, onSwipe: (StockQuote) -> 
 }
 
 @Composable
-private fun StockQuoteCard(stockQuote: StockQuote) {
+private fun StockQuoteCard(modifier: Modifier = Modifier, stockQuote: StockQuote) {
   Card(
-    modifier = Modifier
+    modifier = modifier
       .padding(horizontal = 16.dp, vertical = 8.dp)
       .fillMaxWidth()
   ) {
