@@ -58,7 +58,11 @@ fun StockListScreen(
   Scaffold(
     snackbarHost = { SnackbarHost(snackbarHostState) },
     topBar = {
-      SymbolSearch(stockListState.symbolSearchState, onSymbolSearchQueryChanged, onSymbolSearchSuggestionClicked)
+      SymbolSearch(
+        stockListState.symbolSearchState,
+        onSymbolSearchQueryChanged,
+        onSymbolSearchSuggestionClicked
+      )
     }
   ) { paddingValues ->
     SwipeRefresh(
@@ -84,7 +88,8 @@ fun StockListScreen(
             ) { quote ->
               WatchlistQuoteCard(
                 modifier = Modifier.animateItemPlacement(),
-                stockQuote = quote, onWatchlistRowSwiped)
+                stockQuote = quote, onWatchlistRowSwiped
+              )
             }
           }
 
@@ -172,7 +177,12 @@ private fun WatchlistQuoteCard(
 ) {
   val startAction = SwipeAction(
     onSwipe = { onSwipe(stockQuote) },
-    icon = { Icon(Icons.Default.Delete, contentDescription = stringResource(id = R.string.remove_from_watchlist)) },
+    icon = {
+      Icon(
+        Icons.Default.Delete,
+        contentDescription = stringResource(id = R.string.remove_from_watchlist)
+      )
+    },
     background = MaterialTheme.colorScheme.error
   )
 

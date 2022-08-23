@@ -19,16 +19,18 @@ class MainApplication : Application(), Configuration.Provider {
     super.onCreate()
 
     val stockWorker = OneTimeWorkRequestBuilder<FinnhubSymbolSyncWork>()
-      .setConstraints(Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .build()
+      .setConstraints(
+        Constraints.Builder()
+          .setRequiredNetworkType(NetworkType.CONNECTED)
+          .build()
       )
       .build()
 
     val quotesWorker = PeriodicWorkRequestBuilder<FinnhubQuotesSyncWork>(24, TimeUnit.HOURS)
-      .setConstraints(Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .build()
+      .setConstraints(
+        Constraints.Builder()
+          .setRequiredNetworkType(NetworkType.CONNECTED)
+          .build()
       )
       .build()
 

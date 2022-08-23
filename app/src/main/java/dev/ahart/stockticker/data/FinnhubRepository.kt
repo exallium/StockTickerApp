@@ -101,8 +101,8 @@ class FinnhubRepository @Inject constructor(
         quote
       }
 
-     database.quoteDao().insertAll(entities)
-     result
+      database.quoteDao().insertAll(entities)
+      result
     }
   }
 
