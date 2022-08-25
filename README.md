@@ -1,7 +1,7 @@
 # StockTicker App
 
-This application should serve as an example of several ways to build out the API
-between a view model and ui.
+Simple app that displays a few FAANG stock tickers and allows the user to search for and
+add different tickers to a watchlist.
 
 ## API Keys
 
